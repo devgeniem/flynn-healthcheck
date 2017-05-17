@@ -9,7 +9,6 @@ COPY package.json /usr/src/app/
 RUN npm install
 COPY check.js /usr/src/app/
 COPY entry.sh /usr/src/app/
-RUN chmod +x /usr/src/app/entry.sh
 
 # Run the script
-ENTRYPOINT /usr/src/app/entry.sh
+CMD ["node", "/usr/src/app/check.js"]
