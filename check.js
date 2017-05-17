@@ -16,7 +16,12 @@ new (class HealthCheck {
                 this.slack_url      = config.slack_url;
                 this.interval       = config.interval;
                 this.okay_interval  = config.okay_interval;
-                this.count          = config.okay_interval;
+
+                this.count = {};
+
+                this.clusters.forEach( ( cluster ) => {
+                    this.count[ cluster.name ] = config.okay_interval;
+                });
 
                 this.run();
             }
@@ -28,9 +33,9 @@ new (class HealthCheck {
             request( cluster.url, ( error, response, body ) => {
                 var data = JSON.parse( body );
 
-                if ( this.count == this.okay_interval && data.data.status == 'healthy' ) {
+                if ( this.count[ cluster.name ] == this.okay_interval && data.data.status == 'healthy' ) {
                     this.slack( 'health checks are running okay.', cluster.name );
-                    this.count = 0;
+                    this.count[ cluster.name ] = 0;
                 }
 
                 Object.keys( data.data.detail ).forEach( ( key ) => {
@@ -41,7 +46,7 @@ new (class HealthCheck {
                     }
                 });
 
-                this.count++;
+                this.count[ cluster.name ]++;
             });
         });
 
